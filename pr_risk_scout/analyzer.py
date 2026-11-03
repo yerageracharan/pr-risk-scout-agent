@@ -1,85 +1,75 @@
+"""Explainable PR risk signals. Rules prompt review; they do not prove defects."""
+from __future__ import annotations
 from collections import Counter
+import re
 from .parser import parse_unified_diff
 
 RULES = [
-    ("AUTH_PERMISSION_CHANGE", "high",
-     ("auth", "permission", "authorize", "authentication", "is_admin", "role", "access_control"),
-     "Authentication or permission-related code changed.",
-     "Does this preserve intended access checks for every affected role?"),
-    ("DATABASE_MIGRATION", "high",
-     ("migration", "alter table", "drop table", "drop column", "schema", "alembic", "django.db.migrations"),
-     "Database schema or migration-related code changed.",
-     "Is this safe for existing data and deployment order?"),
-    ("PUBLIC_API_CHANGE", "medium",
-     ("api/", "/api", "endpoint", "route", "openapi", "swagger", "router"),
-     "API or interface-related code changed.",
-     "Could existing clients depend on the previous contract?"),
-    ("DEPENDENCY_CHANGE", "medium",
-     ("requirements.txt", "pyproject.toml", "poetry.lock", "uv.lock", "package-lock.json", "package.json", "pom.xml", "cargo.toml"),
-     "A dependency manifest or lockfile changed.",
-     "Are compatibility and release notes understood?"),
-    ("TEST_CHANGE", "medium",
-     ("test", "spec", "pytest", "unittest"),
-     "Test-related code changed.",
-     "Do tests still cover changed behaviour and failure cases?"),
+    {"id":"AUTH_PERMISSION_CHANGE","severity":"high","path":r"(^|/)(auth|security|permissions?|access)(/|_|\.|$)|session","text":r"\b(authoriz|authentication|permission|is_admin|access_token|csrf|rbac|acl)\b","why":"Authentication, session, or permission-related code changed.","question":"Do all affected users still receive only the access they are entitled to?"},
+    {"id":"DATABASE_MIGRATION","severity":"high","path":r"(^|/)(migrations?|alembic|schema)(/|_|\.|$)|\.sql$","text":r"\b(drop table|drop column|truncate|alter table|foreign key|cascade|migration)\b","why":"Database structure or migration behaviour changed.","question":"Is this safe for existing data, rollback, and deployment order?"},
+    {"id":"TLS_SECURITY_CHANGE","severity":"high","path":r"(ssl|tls|cert|certificate)","text":r"\b(ssl_context|tls|certificate|cert_reqs|ca_certs|verify\s*=\s*false|cert_none|check_hostname)\b","why":"TLS or certificate-verification behaviour changed.","question":"Does the new behaviour preserve certificate verification and the intended trust store?"},
+    {"id":"SECRET_EXPOSURE","severity":"critical","path":r".*","text":r"(?:AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}|(?:api[_-]?key|password|secret|token)\s*[:=]\s*['\"][A-Za-z0-9_/\-+=]{12,}['\"])","why":"A newly added line resembles a hard-coded credential.","question":"Is this a real credential? Remove it from history and rotate it if exposed.","added_only":True},
+    {"id":"DANGEROUS_EXECUTION","severity":"high","path":r".*","text":r"\b(eval|exec)\s*\(|\bos\.system\s*\(|shell\s*=\s*true","why":"Dynamic execution or shell invocation changed.","question":"Can untrusted input reach this path, and is the command safely parameterised?","added_only":True},
+    {"id":"DEPENDENCY_CHANGE","severity":"medium","path":r"(^|/)(requirements([.-].*)?\.txt|pyproject\.toml|poetry\.lock|uv\.lock|pdm\.lock|package(-lock)?\.json|cargo\.toml|go\.sum|go\.mod|pom\.xml|gemfile(\.lock)?)$|(^|/)\.github/workflows/","text":r"\b(dependencies|dependency|requirements|lockfile|uses:|actions/)\b","why":"A package or CI action dependency changed.","question":"Do the version, transitive dependencies, provenance, and release notes make sense?"},
+    {"id":"CI_WORKFLOW_CHANGE","severity":"medium","path":r"(^|/)(\.github/workflows|\.circleci|\.buildkite|azure-pipelines|\.gitlab-ci)","text":r"\b(uses:|actions/|workflow|runner|matrix|permissions:)\b","why":"Build or automation workflow behaviour changed.","question":"Does this preserve least-privilege permissions, pinned actions, and the intended test matrix?"},
+    {"id":"RUNTIME_COMPATIBILITY","severity":"medium","path":r"(pyproject\.toml|setup\.py|setup\.cfg|tox\.ini|\.github/workflows|\.python-version|readme|installation)","text":r"(requires-python|python[_-]version|python\s+3\.\d|py3\.\d|drop support for python|classifiers)","why":"Supported runtime or interpreter test matrix changed.","question":"Are support policy, package metadata, docs, CI matrix, and compatibility tests aligned?"},
+    {"id":"CACHE_CORRECTNESS","severity":"medium","path":r"(cache|memoiz|_fields|_schema)","text":r"\b(cache|memoiz|cached|template|lru_cache|cache_key)\b","why":"Caching or reuse of computed objects changed.","question":"Can cached values become stale, be mutated, or leak state between instances?"},
+    {"id":"SCHEMA_GENERATION","severity":"medium","path":r"(schema|_fields|model_construction|typing_extra)","text":r"\b(schema|annotation|field_info|union|serializer|validator|type_adapter)\b","why":"Schema, annotation, or model-construction behaviour changed.","question":"Do unions, forward references, defaults, and custom hooks still behave correctly?"},
+    {"id":"TIMING_BEHAVIOR","severity":"medium","path":r"(timing|runner|subtests)","text":r"\b(perf_counter|monotonic|duration|time\.time|instant|start|stop)\b","why":"Timing measurement or duration representation changed.","question":"Are clock mocking, monotonic elapsed time, zero values, and plugin compatibility handled?"},
+    {"id":"TYPE_CHECKING_CHANGE","severity":"medium","path":r"(diagnostic|semantic|type|ty/)","text":r"\b(final|override|decorator|functionliteral|is_function_def|static_class_literal)\b","why":"Static type-checking or decorator-related analysis changed.","question":"Do inheritance, decorators, aliases, and autofix boundaries remain correct?"},
+    {"id":"PARSER_SYNTAX_CHANGE","severity":"medium","path":r"(parser|syntax|semantic_errors|ast)","text":r"(__debug__|augassign|syntax|ast|semantic|target-version)","why":"Parsing or syntax-diagnostic behaviour changed.","question":"Are supported language versions and syntactic contexts covered by fixtures?"},
+    {"id":"TEST_SURFACE_CHANGE","severity":"low","path":r"(^|/)(tests?|testing)(/|_)|(^|/)(test_[^/]+|[^/]+_test\.py)|\.snap$","text":r"\b(test|pytest|fixture|snapshot|assert)\b","why":"A test, fixture, or expected-output surface changed.","question":"Does the test exercise the intended regression rather than just restating implementation?"},
+    {"id":"PUBLIC_API_CHANGE","severity":"medium","path":r"(openapi|swagger|(^|/)api(/|_)|routes?|endpoints?)","text":r"\b(endpoint|response_model|request_model|openapi|swagger|public_api)\b","why":"A public interface or endpoint contract may have changed.","question":"Could an existing client rely on the old name, type, status code, or response shape?"},
+    {"id":"ERROR_HANDLING_CHANGE","severity":"medium","path":r".*","text":r"\b(try:|except\b|raise\b|BaseExceptionGroup|ExceptionGroup|fallback)\b","why":"Error propagation or fallback behaviour changed.","question":"Are expected errors preserved, unexpected errors visible, and cleanup paths safe?"},
+    {"id":"SERIALIZATION_CHANGE","severity":"medium","path":r".*","text":r"\b(pickle|yaml\.load|json\.loads|deserialize|serializer|encoding)\b","why":"Serialization or deserialization behaviour changed.","question":"Can untrusted or old data be decoded safely, and is backward compatibility preserved?"},
 ]
 
-def analyze_diff(diff_text, source="local diff"):
-    changed = parse_unified_diff(diff_text)
+def analyze_diff(diff_text: str, source: str = "local diff", file_path: str | None = None) -> dict:
+    changed = parse_unified_diff(diff_text, file_path=file_path)
     findings, seen = [], set()
-    for item in changed:
-        haystack = (item["file"] + " " + item["content"]).lower()
-        for rule_id, severity, terms, reason, question in RULES:
-            match = next((term for term in terms if term in haystack), None)
-            key = (rule_id, item["file"], item["line"])
-            if match and key not in seen:
-                seen.add(key)
-                findings.append({
-                    "rule_id": rule_id,
-                    "severity": severity,
-                    "file": item["file"],
-                    "line": item["line"],
-                    "evidence": item["content"].strip()[:240],
-                    "matched_signal": match,
-                    "why_it_matters": reason,
-                    "review_question": question,
-                })
-    counts = Counter(f["severity"] for f in findings)
+    for record in changed:
+        path = record["file"].lower()
+        content = record["content"].strip()
+        for rule in RULES:
+            if rule.get("added_only") and record["change"] != "added":
+                continue
+            path_match = bool(re.search(rule["path"], path, flags=re.I))
+            content_match = bool(re.search(rule["text"], content, flags=re.I))
+            if not (path_match or content_match):
+                continue
+            if rule["id"] == "SECRET_EXPOSURE" and not content_match:
+                continue
+            key = (rule["id"], record["file"])
+            if key in seen:
+                continue
+            seen.add(key)
+            findings.append({
+                "rule_id":rule["id"],"severity":rule["severity"],"file":record["file"],
+                "line":record["line"],"change":record["change"],"evidence":content[:260],
+                "why_it_matters":rule["why"],"review_question":rule["question"],
+            })
+    counts = Counter(item["severity"] for item in findings)
+    by_rule = Counter(item["rule_id"] for item in findings)
     return {
-        "project": "PR Risk Scout Agent",
-        "source": source,
-        "mode": "read-only heuristic analysis",
-        "summary": {
-            "changed_lines_inspected": len(changed),
-            "review_signals": len(findings),
-            "high": counts["high"],
-            "medium": counts["medium"],
-        },
-        "findings": findings,
-        "disclaimer": "Signals are heuristic prompts for human review, not proof of defects or vulnerabilities.",
+        "project":"PR Risk Scout Agent","source":source,"mode":"read-only heuristic analysis",
+        "summary":{"changed_lines_inspected":len(changed),"files_with_changes":len({x["file"] for x in changed}),
+                   "review_signals":len(findings),"critical":counts["critical"],"high":counts["high"],
+                   "medium":counts["medium"],"low":counts["low"]},
+        "rule_counts":dict(sorted(by_rule.items())),"findings":findings,
+        "disclaimer":"Signals are heuristic prompts for human review, not proof of defects, vulnerabilities, or production impact. A clean report does not prove safety."
     }
 
-def render_markdown(report):
-    summary = report["summary"]
-    lines = [
-        "# PR Risk Scout Report", "",
-        f"**Source:** {report['source']}  ",
-        f"**Mode:** {report['mode']}", "",
-        "## Summary", "",
-        f"- Changed lines inspected: {summary['changed_lines_inspected']}",
-        f"- Review signals: {summary['review_signals']}",
-        f"- High: {summary['high']} | Medium: {summary['medium']}", "",
-        "## Findings", "",
-    ]
+def render_markdown(report: dict) -> str:
+    s=report["summary"]
+    lines=["# PR Risk Scout Report","",f"Source: {report['source']}  ",f"Mode: {report['mode']}","","## Summary","",
+           f"- Files with changes: {s['files_with_changes']}",f"- Changed lines inspected: {s['changed_lines_inspected']}",
+           f"- Review signals: {s['review_signals']}",f"- Critical: {s['critical']} | High: {s['high']} | Medium: {s['medium']} | Low: {s['low']}","","## Findings",""]
     if not report["findings"]:
-        lines.append("No configured signals detected. This does not prove the PR is safe.")
-    for finding in report["findings"]:
-        lines += [
-            f"### [{finding['severity'].upper()}] {finding['rule_id']}",
-            f"- **Location:** `{finding['file']}:{finding['line']}`",
-            f"- **Evidence:** `{finding['evidence']}`",
-            f"- **Why it matters:** {finding['why_it_matters']}",
-            f"- **Review question:** {finding['review_question']}", "",
-        ]
-    lines += ["---", f"> {report['disclaimer']}", ""]
+        lines.append("No configured review signals were detected. This does not prove the PR is safe.")
+    for item in report["findings"]:
+        lines += [f"### [{item['severity'].upper()}] {item['rule_id']}",
+                  f"- Location: {item['file']}:{item['line']} ({item['change']})",
+                  f"- Evidence: {item['evidence']}",f"- Why it matters: {item['why_it_matters']}",
+                  f"- Review question: {item['review_question']}",""]
+    lines += ["---",f"> {report['disclaimer']}",""]
     return "\n".join(lines)

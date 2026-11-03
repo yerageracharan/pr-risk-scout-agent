@@ -1,0 +1,150 @@
+{
+  "title": "PR Risk Scout real-repository case study",
+  "method": "Nine merged public pull requests from five mature open-source projects. Expected focus categories were manually assigned from PR title, metadata, and patch review. They are review-focus labels, not vulnerability ground truth.",
+  "cases": [
+    {
+      "repo": "pallets/flask",
+      "number": 6168,
+      "title": "drop support for Python 3.10",
+      "url": "https://github.com/pallets/flask/pull/6168",
+      "base_sha": "d73fa1cdcbd8b1465c151db8924ba58b1dd14e35",
+      "head_sha": "7689f98403e2c0b0bc8d1031e60f8cff2620e86a",
+      "merged_at": "2026-10-07T13:56:06Z",
+      "changed_files": 12,
+      "additions": 67,
+      "deletions": 433,
+      "expected_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "RUNTIME_COMPATIBILITY",
+        "TEST_SURFACE_CHANGE"
+      ]
+    },
+    {
+      "repo": "psf/requests",
+      "number": 7636,
+      "title": "Bump the actions group with 4 updates",
+      "url": "https://github.com/psf/requests/pull/7636",
+      "base_sha": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "head_sha": "a7d2a5d259b74e97812c2db04acb34adf41ba22e",
+      "merged_at": "2026-10-26T17:14:42Z",
+      "changed_files": 2,
+      "additions": 4,
+      "deletions": 4,
+      "expected_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "DEPENDENCY_CHANGE"
+      ]
+    },
+    {
+      "repo": "psf/requests",
+      "number": 6767,
+      "title": "Revert caching a default SSLContext",
+      "url": "https://github.com/psf/requests/pull/6767",
+      "base_sha": "8ff173b186f135670879db9fbe1e68a6b5209c89",
+      "head_sha": "11d68c17bcd66bd3e2c5137b0a7aad7f59967102",
+      "merged_at": "2025-06-13T16:42:08Z",
+      "changed_files": 1,
+      "additions": 16,
+      "deletions": 39,
+      "expected_categories": [
+        "TLS_SECURITY_CHANGE"
+      ]
+    },
+    {
+      "repo": "pydantic/pydantic",
+      "number": 13544,
+      "title": "Add fast paths for fields defined by a pure annotation and a simple default",
+      "url": "https://github.com/pydantic/pydantic/pull/13544",
+      "base_sha": "149ed2ae5f0f02f24300b7a8a54976cd3b208ca5",
+      "head_sha": "1f9b994fd700d9c8f3df18d181efa269c1b2a65a",
+      "merged_at": "2026-11-03T18:31:06Z",
+      "changed_files": 10,
+      "additions": 1403,
+      "deletions": 220,
+      "expected_categories": [
+        "CACHE_CORRECTNESS",
+        "SCHEMA_GENERATION",
+        "TEST_SURFACE_CHANGE"
+      ]
+    },
+    {
+      "repo": "pydantic/pydantic",
+      "number": 14138,
+      "title": "Construct builtin scalar union schemas directly",
+      "url": "https://github.com/pydantic/pydantic/pull/14138",
+      "base_sha": "ff6550685d6e13fcc5de3a5f661aabf7063cb8e7",
+      "head_sha": "bb9a26c665a2acbfc120c2a0d1f22a8d88ec1fba",
+      "merged_at": "2026-11-03T16:10:31Z",
+      "changed_files": 2,
+      "additions": 193,
+      "deletions": 1,
+      "expected_categories": [
+        "SCHEMA_GENERATION",
+        "TEST_SURFACE_CHANGE"
+      ]
+    },
+    {
+      "repo": "pytest-dev/pytest",
+      "number": 15309,
+      "title": "Bump the github-actions group with 3 updates",
+      "url": "https://github.com/pytest-dev/pytest/pull/15309",
+      "base_sha": "afac7979e3d0d30914aa986192dcbbc48379cb86",
+      "head_sha": "2dba1ac121b91f974ac37b1f06eee68694259fd7",
+      "merged_at": "2026-11-02T16:41:27Z",
+      "changed_files": 2,
+      "additions": 4,
+      "deletions": 4,
+      "expected_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "DEPENDENCY_CHANGE"
+      ]
+    },
+    {
+      "repo": "pytest-dev/pytest",
+      "number": 15298,
+      "title": "Store a timing.Duration in CallInfo",
+      "url": "https://github.com/pytest-dev/pytest/pull/15298",
+      "base_sha": "a7b2446ee41a7298d3a0bc22c52f3b8bacae1566",
+      "head_sha": "fd356839cbe402940c46ef50256b41b5ad0eb612",
+      "merged_at": "2026-10-30T10:38:56Z",
+      "changed_files": 7,
+      "additions": 132,
+      "deletions": 36,
+      "expected_categories": [
+        "TIMING_BEHAVIOR",
+        "TEST_SURFACE_CHANGE"
+      ]
+    },
+    {
+      "repo": "astral-sh/ruff",
+      "number": 29961,
+      "title": "Handle decorators that replace overrides of final methods",
+      "url": "https://github.com/astral-sh/ruff/pull/29961",
+      "base_sha": "19db56ae3e2a7aaad355363a66266cd94d075c10",
+      "head_sha": "a72b0c7412af81b5c86e2cdbbf6f47ca9079d0b7",
+      "merged_at": "2026-11-03T16:56:46Z",
+      "changed_files": 2,
+      "additions": 56,
+      "deletions": 4,
+      "expected_categories": [
+        "TYPE_CHECKING_CHANGE"
+      ]
+    },
+    {
+      "repo": "astral-sh/ruff",
+      "number": 27908,
+      "title": "Extend __debug__ write check to attribute targets",
+      "url": "https://github.com/astral-sh/ruff/pull/27908",
+      "base_sha": "89d00519b404b4bea7f145255306e28aec357049",
+      "head_sha": "c7c7df43fe1fb7f58873ab21f3cd9e03a65250b3",
+      "merged_at": "2026-11-03T18:06:41Z",
+      "changed_files": 5,
+      "additions": 470,
+      "deletions": 10,
+      "expected_categories": [
+        "PARSER_SYNTAX_CHANGE",
+        "TEST_SURFACE_CHANGE"
+      ]
+    }
+  ]
+}
