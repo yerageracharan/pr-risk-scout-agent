@@ -1,0 +1,275 @@
+{
+  "title": "PR Risk Scout real-repository case study",
+  "generated_at": "2026-11-04",
+  "method": "Nine merged public pull requests from Flask, Requests, Pydantic, pytest, and Ruff. Expected review-focus labels were manually assigned after inspecting public PR titles, metadata, and diffs; they are not vulnerability ground truth.",
+  "case_count": 9,
+  "expected_focus_labels": 18,
+  "matched_focus_labels": 18,
+  "focus_label_coverage": 1,
+  "cases_with_any_expected_signal": 9,
+  "case_hit_rate": 1,
+  "metrics_note": "100% focus-label coverage means the configured rules surfaced all 18 manually selected review-focus labels in these nine specific examples. It is not 100% accuracy, precision, recall, F1, security certification, or a production performance estimate.",
+  "results": [
+    {
+      "repo": "pallets/flask",
+      "number": 6168,
+      "title": "drop support for Python 3.10",
+      "url": "https://github.com/pallets/flask/pull/6168",
+      "base_sha": "d73fa1cdcbd8b1465c151db8924ba58b1dd14e35",
+      "head_sha": "7689f98403e2c0b0bc8d1031e60f8cff2620e86a",
+      "files_changed": 12,
+      "additions": 67,
+      "deletions": 433,
+      "changed_lines_inspected": 71,
+      "expected_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "RUNTIME_COMPATIBILITY",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "detected_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "ERROR_HANDLING_CHANGE",
+        "RUNTIME_COMPATIBILITY",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "matched_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "RUNTIME_COMPATIBILITY",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "missed_categories": [],
+      "additional_signals": [
+        "ERROR_HANDLING_CHANGE"
+      ]
+    },
+    {
+      "repo": "psf/requests",
+      "number": 7636,
+      "title": "Bump the actions group with 4 updates",
+      "url": "https://github.com/psf/requests/pull/7636",
+      "base_sha": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60",
+      "head_sha": "a7d2a5d259b74e97812c2db04acb34adf41ba22e",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 4,
+      "changed_lines_inspected": 8,
+      "expected_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "DEPENDENCY_CHANGE"
+      ],
+      "detected_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "DEPENDENCY_CHANGE"
+      ],
+      "matched_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "DEPENDENCY_CHANGE"
+      ],
+      "missed_categories": [],
+      "additional_signals": []
+    },
+    {
+      "repo": "psf/requests",
+      "number": 6767,
+      "title": "Revert caching a default SSLContext",
+      "url": "https://github.com/psf/requests/pull/6767",
+      "base_sha": "8ff173b186f135670879db9fbe1e68a6b5209c89",
+      "head_sha": "11d68c17bcd66bd3e2c5137b0a7aad7f59967102",
+      "files_changed": 1,
+      "additions": 16,
+      "deletions": 39,
+      "changed_lines_inspected": 55,
+      "expected_categories": [
+        "TLS_SECURITY_CHANGE"
+      ],
+      "detected_categories": [
+        "ERROR_HANDLING_CHANGE",
+        "TLS_SECURITY_CHANGE"
+      ],
+      "matched_categories": [
+        "TLS_SECURITY_CHANGE"
+      ],
+      "missed_categories": [],
+      "additional_signals": [
+        "ERROR_HANDLING_CHANGE"
+      ]
+    },
+    {
+      "repo": "pydantic/pydantic",
+      "number": 13544,
+      "title": "Add fast paths for fields defined by a pure annotation and a simple default",
+      "url": "https://github.com/pydantic/pydantic/pull/13544",
+      "base_sha": "149ed2ae5f0f02f24300b7a8a54976cd3b208ca5",
+      "head_sha": "1f9b994fd700d9c8f3df18d181efa269c1b2a65a",
+      "files_changed": 10,
+      "additions": 1403,
+      "deletions": 220,
+      "changed_lines_inspected": 1623,
+      "expected_categories": [
+        "CACHE_CORRECTNESS",
+        "SCHEMA_GENERATION",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "detected_categories": [
+        "CACHE_CORRECTNESS",
+        "ERROR_HANDLING_CHANGE",
+        "SCHEMA_GENERATION",
+        "SERIALIZATION_CHANGE",
+        "TEST_SURFACE_CHANGE",
+        "TIMING_BEHAVIOR",
+        "TYPE_CHECKING_CHANGE"
+      ],
+      "matched_categories": [
+        "CACHE_CORRECTNESS",
+        "SCHEMA_GENERATION",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "missed_categories": [],
+      "additional_signals": [
+        "ERROR_HANDLING_CHANGE",
+        "SERIALIZATION_CHANGE",
+        "TIMING_BEHAVIOR",
+        "TYPE_CHECKING_CHANGE"
+      ]
+    },
+    {
+      "repo": "pydantic/pydantic",
+      "number": 14138,
+      "title": "Construct builtin scalar union schemas directly",
+      "url": "https://github.com/pydantic/pydantic/pull/14138",
+      "base_sha": "ff6550685d6e13fcc5de3a5f661aabf7063cb8e7",
+      "head_sha": "bb9a26c665a2acbfc120c2a0d1f22a8d88ec1fba",
+      "files_changed": 2,
+      "additions": 193,
+      "deletions": 1,
+      "changed_lines_inspected": 194,
+      "expected_categories": [
+        "SCHEMA_GENERATION",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "detected_categories": [
+        "ERROR_HANDLING_CHANGE",
+        "SCHEMA_GENERATION",
+        "SERIALIZATION_CHANGE",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "matched_categories": [
+        "SCHEMA_GENERATION",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "missed_categories": [],
+      "additional_signals": [
+        "ERROR_HANDLING_CHANGE",
+        "SERIALIZATION_CHANGE"
+      ]
+    },
+    {
+      "repo": "pytest-dev/pytest",
+      "number": 15309,
+      "title": "Bump the github-actions group with 3 updates",
+      "url": "https://github.com/pytest-dev/pytest/pull/15309",
+      "base_sha": "afac7979e3d0d30914aa986192dcbbc48379cb86",
+      "head_sha": "2dba1ac121b91f974ac37b1f06eee68694259fd7",
+      "files_changed": 2,
+      "additions": 4,
+      "deletions": 4,
+      "changed_lines_inspected": 8,
+      "expected_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "DEPENDENCY_CHANGE"
+      ],
+      "detected_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "DEPENDENCY_CHANGE"
+      ],
+      "matched_categories": [
+        "CI_WORKFLOW_CHANGE",
+        "DEPENDENCY_CHANGE"
+      ],
+      "missed_categories": [],
+      "additional_signals": []
+    },
+    {
+      "repo": "pytest-dev/pytest",
+      "number": 15298,
+      "title": "Store a timing.Duration in CallInfo",
+      "url": "https://github.com/pytest-dev/pytest/pull/15298",
+      "base_sha": "a7b2446ee41a7298d3a0bc22c52f3b8bacae1566",
+      "head_sha": "fd356839cbe402940c46ef50256b41b5ad0eb612",
+      "files_changed": 7,
+      "additions": 132,
+      "deletions": 36,
+      "changed_lines_inspected": 168,
+      "expected_categories": [
+        "TIMING_BEHAVIOR",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "detected_categories": [
+        "TEST_SURFACE_CHANGE",
+        "TIMING_BEHAVIOR"
+      ],
+      "matched_categories": [
+        "TIMING_BEHAVIOR",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "missed_categories": [],
+      "additional_signals": []
+    },
+    {
+      "repo": "astral-sh/ruff",
+      "number": 29961,
+      "title": "Handle decorators that replace overrides of final methods",
+      "url": "https://github.com/astral-sh/ruff/pull/29961",
+      "base_sha": "19db56ae3e2a7aaad355363a66266cd94d075c10",
+      "head_sha": "a72b0c7412af81b5c86e2cdbbf6f47ca9079d0b7",
+      "files_changed": 2,
+      "additions": 56,
+      "deletions": 4,
+      "changed_lines_inspected": 60,
+      "expected_categories": [
+        "TYPE_CHECKING_CHANGE"
+      ],
+      "detected_categories": [
+        "TEST_SURFACE_CHANGE",
+        "TYPE_CHECKING_CHANGE"
+      ],
+      "matched_categories": [
+        "TYPE_CHECKING_CHANGE"
+      ],
+      "missed_categories": [],
+      "additional_signals": [
+        "TEST_SURFACE_CHANGE"
+      ]
+    },
+    {
+      "repo": "astral-sh/ruff",
+      "number": 27908,
+      "title": "Extend __debug__ write check to attribute targets",
+      "url": "https://github.com/astral-sh/ruff/pull/27908",
+      "base_sha": "89d00519b404b4bea7f145255306e28aec357049",
+      "head_sha": "c7c7df43fe1fb7f58873ab21f3cd9e03a65250b3",
+      "files_changed": 5,
+      "additions": 470,
+      "deletions": 10,
+      "changed_lines_inspected": 480,
+      "expected_categories": [
+        "PARSER_SYNTAX_CHANGE",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "detected_categories": [
+        "PARSER_SYNTAX_CHANGE",
+        "TEST_SURFACE_CHANGE",
+        "TYPE_CHECKING_CHANGE"
+      ],
+      "matched_categories": [
+        "PARSER_SYNTAX_CHANGE",
+        "TEST_SURFACE_CHANGE"
+      ],
+      "missed_categories": [],
+      "additional_signals": [
+        "TYPE_CHECKING_CHANGE"
+      ]
+    }
+  ],
+  "interpretation": "Additional signals need review and are not automatically false positives. The benchmark is deliberately small, has a Python/open-source bias, and has manually selected review-focus labels rather than exhaustive independently adjudicated ground truth."
+}
