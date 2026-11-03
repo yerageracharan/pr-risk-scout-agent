@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: \${{ matrix.python-version }}
+          python-version: ${{ matrix.python-version }}
       - run: python -m pip install --upgrade pip
       - run: pip install -r requirements.txt pytest
       - run: python -m compileall -q pr_risk_scout benchmarks
@@ -34,8 +34,6 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install -r requirements.txt
       - name: Analyse pinned public pull requests
-        env:
-          GITHUB_TOKEN: \${{ github.token }}
         run: python -m benchmarks.run_real_benchmark
       - name: Upload benchmark report
         uses: actions/upload-artifact@v4
