@@ -1,21 +1,45 @@
-name: tests
+name: tests-and-real-pr-benchmark
 
 on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
-  test:
+  unit-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: \${{ matrix.python-version }}
       - run: python -m pip install --upgrade pip
       - run: pip install -r requirements.txt pytest
-      - run: python -m compileall -q pr_risk_scout
+      - run: python -m compileall -q pr_risk_scout benchmarks
       - run: python -m pytest -q
+
+  real-public-pr-benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --upgrade pip
+      - run: pip install -r requirements.txt
+      - name: Analyse pinned public pull requests
+        env:
+          GITHUB_TOKEN: \${{ github.token }}
+        run: python -m benchmarks.run_real_benchmark
+      - name: Upload benchmark report
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-pr-benchmark
+          path: benchmarks/results/real_pr_benchmark.json
+          if-no-files-found: error
