@@ -38,7 +38,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python -m benchmarks.run_real_benchmark
       - name: Upload benchmark report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: real-pr-benchmark
           path: benchmarks/results/real_pr_benchmark.json
