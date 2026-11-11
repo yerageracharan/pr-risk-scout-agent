@@ -7,7 +7,7 @@ def patch(path, body):
 def test_parser_preserves_added_and_removed_lines():
     diff = """--- a/app/auth.py
 +++ b/app/auth.py
-@@ -10,2 +10,2 @@
+@@ -10,1 +10,1 @@
 -old_check = user.is_admin
 +new_check = user.has_access
 """
