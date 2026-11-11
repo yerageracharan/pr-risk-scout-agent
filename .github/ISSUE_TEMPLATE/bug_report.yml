@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a reproducible parser, detector, or report defect.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Use synthetic diffs. Do not include live credentials, private repository source, or confidential PR content."
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+    validations:
+      required: true
+  - type: textarea
+    id: diff
+    attributes:
+      label: Minimal unified diff
+      render: diff
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected finding or parser behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual output and evidence
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Commit SHA / version

@@ -1,0 +1,30 @@
+name: Feature request
+description: Propose an explainable PR risk signal or benchmark improvement.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Review scenario
+      description: What kind of diff or risk should reviewers notice?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed signal and review question
+    validations:
+      required: true
+  - type: textarea
+    id: negative_cases
+    attributes:
+      label: False-positive and false-negative cases
+      description: Include examples where the new rule should not match.
+    validations:
+      required: true
+  - type: textarea
+    id: evaluation
+    attributes:
+      label: Evaluation plan
+    validations:
+      required: true
